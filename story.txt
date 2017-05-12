@@ -1,0 +1,92 @@
+package heesuekim.a20170509_lecturedemo;
+
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+import java.lang.Object;
+
+public class MainActivity extends AppCompatActivity {
+    //program package
+    //should have pre-defined initiation method
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        //calling the generalized initialization sequence in OS
+        super.onCreate(savedInstanceState);
+
+        //This app is specifically dealing with activity_main.xml Layout
+        setContentView(R.layout.activity_main);
+
+
+        //reference of 'myTV' under 'id' category
+        //gain control of the textview
+        TextView myDisplayTV = (TextView) findViewById(R.id.myTV);
+        myDisplayTV.setTextColor(Color.BLUE);
+        //myDisplayTV.;
+
+        myDisplayTV.setText("Initialization...");
+
+
+        //Core of EDP
+        //SINGLETON creation pattern: only allowed to be created
+        SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        //Get defulat light sensor reference
+        Sensor lightSensor = sensorMgr.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+
+        LightSensorHandler lightHandler = new LightSensorHandler(myDisplayTV);
+
+        //Register handler to the sensor event
+        sensorMgr.registerListener(lightHandler, lightSensor, sensorMgr.SENSOR_DELAY_NORMAL);
+
+
+    }
+}
+
+
+//any sensor handler needs to implement SensorEventListener
+class LightSensorHandler implements SensorEventListener{
+
+    public final float LIGHT_THRESHOLD = 50;
+    private TextView myLocalTV;
+
+    //my Handler deals with two types of events:
+        //EVENT 1: Sensor ACCURACY changed during runtime
+        //EVENT 2: Sensor READING changed during runtime
+
+    //Empty constructor: you can always overload your contructions....
+    //of course, we don't need it for now
+    public LightSensorHandler(){}
+    public LightSensorHandler (TextView myLocalTV){
+        this.myLocalTV = myLocalTV;
+    }
+
+    //Accuracy
+    public void onAccuracyChanged (Sensor s, int i){
+        //BLANK: don't need
+    }
+
+    //Reading
+    public void onSensorChanged (SensorEvent eventInfo){
+        //do something...
+
+        //light intensity reading
+        float myLightIntensityReading = eventInfo.values[0];
+
+        if(myLightIntensityReading < 50 ){
+            //Report.... on TV
+
+            myLocalTV.setText("Light Too Weak!!!");
+        } else {
+            myLocalTV.setText("Light OK.");
+        }
+    }
+
+}
